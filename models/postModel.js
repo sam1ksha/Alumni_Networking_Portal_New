@@ -3,109 +3,51 @@ const db = require('../config/database');
 
 class Post {
     static async create(postData) {
-        try {
-            const [result] = await db.execute(
-                `INSERT INTO posts (user_id, content, image) VALUES (?, ?, ?)`,
-                [postData.user_id, postData.content, postData.image || null]
-            );
-            return result.insertId;
-        } catch (error) {
-            throw error;
-        }
+        const { user_id, content, image } = postData;
+        const [result] = await db.execute(
+            `INSERT INTO posts (user_id, content, image) VALUES (?, ?, ?)`,
+            [user_id, content, image]
+        );
+        return result.insertId;
     }
 
     static async findAllWithDetails(currentUserId) {
-        try {
-            const [rows] = await db.execute(`
-                SELECT 
-                    p.*,
-                    up.first_name,
-                    up.last_name,
-                    up.profile_picture,
-                    (SELECT COUNT(*) FROM reactions WHERE post_id = p.post_id AND type = 'like') as likes,
-                    (SELECT COUNT(*) FROM reactions WHERE post_id = p.post_id AND type = 'dislike') as dislikes,
-                    (SELECT type FROM reactions WHERE post_id = p.post_id AND user_id = ?) as user_reaction,
-                    p.user_id = ? as is_mine
-                FROM posts p
-                JOIN user_profile up ON p.user_id = up.user_id
-                ORDER BY p.created_at DESC
-            `, [currentUserId, currentUserId]);
-            return rows;
-        } catch (error) {
-            throw error;
-        }
-    }
-
-    static async findByUserIdWithDetails(userId, currentUserId) {
-        try {
-            const [rows] = await db.execute(`
-                SELECT 
-                    p.*,
-                    up.first_name,
-                    up.last_name,
-                    up.profile_picture,
-                    (SELECT COUNT(*) FROM reactions WHERE post_id = p.post_id AND type = 'like') as likes,
-                    (SELECT COUNT(*) FROM reactions WHERE post_id = p.post_id AND type = 'dislike') as dislikes,
-                    (SELECT type FROM reactions WHERE post_id = p.post_id AND user_id = ?) as user_reaction,
-                    p.user_id = ? as is_mine
-                FROM posts p
-                JOIN user_profile up ON p.user_id = up.user_id
-                WHERE p.user_id = ?
-                ORDER BY p.created_at DESC
-            `, [currentUserId, currentUserId, userId]);
-            return rows;
-        } catch (error) {
-            throw error;
-        }
-    }
-
-    static async findByUsernameWithDetails(username, currentUserId) {
-        try {
-            const [rows] = await db.execute(`
-                SELECT 
-                    p.*,
-                    up.first_name,
-                    up.last_name,
-                    up.profile_picture,
-                    (SELECT COUNT(*) FROM reactions WHERE post_id = p.post_id AND type = 'like') as likes,
-                    (SELECT COUNT(*) FROM reactions WHERE post_id = p.post_id AND type = 'dislike') as dislikes,
-                    (SELECT type FROM reactions WHERE post_id = p.post_id AND user_id = ?) as user_reaction,
-                    p.user_id = ? as is_mine
-                FROM posts p
-                JOIN user_profile up ON p.user_id = up.user_id
-                WHERE CONCAT(up.first_name, ' ', up.last_name) LIKE ?
-                ORDER BY p.created_at DESC
-            `, [currentUserId, currentUserId, `%${username}%`]);
-            return rows;
-        } catch (error) {
-            throw error;
-        }
-    }
-
-    static async delete(postId, userId) {
-        try {
-            const [result] = await db.execute(
-                `DELETE FROM posts WHERE post_id = ? AND user_id = ?`,
-                [postId, userId]
-            );
-            return result.affectedRows > 0;
-        } catch (error) {
-            throw error;
-        }
+        const [rows] = await db.execute(`
+            SELECT 
+                p.*, 
+                u.first_name, u.last_name, u.profile_picture,
+                (SELECT COUNT(*) FROM reacts_to WHERE post_id = p.post_id AND reaction = 'like') as likes,
+                (SELECT COUNT(*) FROM reacts_to WHERE post_id = p.post_id AND reaction = 'dislike') as dislikes,
+                (SELECT reaction FROM reacts_to WHERE post_id = p.post_id AND user_id = ?) as user_reaction
+            FROM posts p
+            JOIN all_users_info u ON p.user_id = u.user_id
+            ORDER BY p.created_at DESC
+        `, [currentUserId]);
+        return rows;
     }
 
     static async reactToPost(postId, userId, reactionType) {
-        try {
-            await db.execute(
-                `INSERT INTO reactions (post_id, user_id, type) 
-                 VALUES (?, ?, ?)
-                 ON DUPLICATE KEY UPDATE type = ?`,
-                [postId, userId, reactionType, reactionType]
-            );
-            return true;
-        } catch (error) {
-            throw error;
-        }
+        await db.execute(
+            `INSERT INTO reacts_to (post_id, user_id, reaction) VALUES (?, ?, ?)
+             ON DUPLICATE KEY UPDATE reaction = ?`,
+            [postId, userId, reactionType, reactionType]
+        );
+    }
+
+    static async findByUsernameWithDetails(username, currentUserId) {
+        const [rows] = await db.execute(`
+            SELECT 
+                p.*, 
+                u.first_name, u.last_name, u.profile_picture,
+                (SELECT COUNT(*) FROM reacts_to WHERE post_id = p.post_id AND reaction = 'like') as likes,
+                (SELECT COUNT(*) FROM reacts_to WHERE post_id = p.post_id AND reaction = 'dislike') as dislikes,
+                (SELECT reaction FROM reacts_to WHERE post_id = p.post_id AND user_id = ?) as user_reaction
+            FROM posts p
+            JOIN all_users_info u ON p.user_id = u.user_id
+            WHERE CONCAT(u.first_name, ' ', u.last_name) LIKE ?
+            ORDER BY p.created_at DESC
+        `, [currentUserId, `%${username}%`]);
+        return rows;
     }
 }
 
