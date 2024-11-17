@@ -29,13 +29,28 @@ class JobListing {
         }
     }
 
+
+    static async findAllByUserId(userId) {
+        try {
+            const [rows] = await db.execute(
+                `SELECT * FROM job_offer WHERE user_id = ?`,
+                [userId]
+            );
+            return rows;  // Return all job listings for the specified user
+        } catch (error) {
+            throw error;
+        }
+    }
+
     // Retrieve all job listings
     static async findAll() {
         try {
             const [rows] = await db.execute(
-                `SELECT * FROM job_offer WHERE job_status = 'open' ORDER BY application_deadline ASC`
+                `SELECT * 
+                 FROM job_offer  
+                 ORDER BY application_count DESC`
             );
-            return rows;  // Return all open job listings
+            return rows;  // Return the filtered and sorted job listings
         } catch (error) {
             throw error;
         }
@@ -83,12 +98,16 @@ class JobListing {
     // Delete a job offer
     static async delete(jobId) {
         try {
+            console.log("inside delete()")
             const [result] = await db.execute(
                 `DELETE FROM job_offer WHERE job_id = ?`,
                 [jobId]
             );
+            console.log('Delete result:', result);
+            await db.execute('COMMIT');
             return result.affectedRows > 0;  // Return true if the deletion was successful
         } catch (error) {
+            console.error('Error during deletion:', error.message);
             throw error;
         }
     }

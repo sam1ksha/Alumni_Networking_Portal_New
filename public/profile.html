@@ -14,23 +14,29 @@
         <nav>
             <div class="logo">AlumNet</div>
             <div class="nav-links">
+                <a href="/profile.html/:uid" id="profile-page">Profile</a>
                 <a href="/forums.html">Forums</a>
-                <a href="/posts.html">Posts</a>
-                <a href="/job_details.html">Apply for Jobs</a> 
-                <a href="/job_listing.html">Job Offers</a>  
+                <a href="/posts.html">Posts</a> 
+                <a href="/joblisting/:uid" id="job-listing-link">Jobs</a>  
                 <a href="/index.html">Logout</a>
             </div>
         </nav>
     </header>
 
+
+    <section class="cover-photo">
+        <video autoplay muted loop class="cover-video">
+            <source src="/covervideo.mp4" type="video/mp4" />
+            Your browser does not support the video tag.
+        </video>
+    </section>
+
+
     <div class="container">
         <section class="profile-header card">
-            <div class="profile-pic">
-                <img src="placeholder-profile.jpg" alt="Profile Picture" />
-            </div>
             <div class="profile-info">
                 <h2 class="profile-name">Loading...</h2>
-                <p class="branch-batch">Branch & Batch: <span class="profile-branch">Loading...</span> | <span class="profile-batch">Loading...</span></p>
+                <p class="branch-batch">Branch: <span class="profile-branch">Loading...</span> | <span class="profile-batch">Loading...</span></p>
             </div>
         </section>
 
@@ -41,22 +47,6 @@
             <div id="thoughts-display" class="thoughts-display"></div>
         </section>
 
-        <section class="resume-upload card">
-            <h3 class="section-title">Resume</h3>
-            <input type="file" accept=".pdf,.doc,.docx" id="resume-file" style="display: none;" />
-            <label for="resume-file" class="btn btn-secondary">Choose File</label>
-            <button class="btn" onclick="uploadResume()">Upload</button>
-            <p id="resume-link" class="resume-link"></p>
-        </section>
-
-        <section class="social-media card">
-            <h3 class="section-title">Social Media Links</h3>
-            <input type="text" id="linkedin" placeholder="LinkedIn URL" />
-            <input type="text" id="github" placeholder="GitHub URL" />
-            <input type="text" id="website" placeholder="Personal Website URL" />
-            <button class="btn" onclick="addSocialLinks()">Add Links</button>
-            <div id="social-links" class="social-links"></div>
-        </section>
 
         <section class="work-experience card">
             <h3 class="section-title">Work Experience</h3>
@@ -64,13 +54,74 @@
             <form class="experience-form" id="experience-form" style="display: none;" onsubmit="addExperience(event)">
                 <input type="text" id="job-title" placeholder="Job Title" required />
                 <input type="text" id="company-name" placeholder="Company Name" required />
-                <input type="text" id="duration" placeholder="Duration (e.g. Jan 2020 - Present)" required />
-                <textarea id="responsibilities" placeholder="Responsibilities/Tasks" rows="4" required></textarea>
+                <div>
+                    <label for="currently-employed">Currently Employed:</label>
+                    <select id="currently-employed" onchange="toggleDates()" required>
+                        <option value="yes">Yes</option>
+                        <option value="no">No</option>
+                    </select>
+                </div>
+                <div id="start-date-container">
+                    <label for="start-date">Start Date:</label>
+                    <input type="month" id="start-date" required />
+                </div>
+                <div id="end-date-container" style="display: none;">
+                    <label for="end-date">End Date:</label>
+                    <input type="month" id="end-date" />
+                </div>
+                <textarea id="responsibilities" placeholder="Responsibilities/Tasks (Optional)" rows="4"></textarea>
                 <button type="submit" class="btn">Add Experience</button>
             </form>
             <div class="experience-list" id="experience-list"></div>
+        </section> 
+
+        <section class="resume-upload card">
+            <h3 class="section-title">Resume</h3>
+            <input type="file" accept=".pdf,.doc,.docx" id="resume-file" style="display: none;" />
+            <label for="resume-file" class="btn btn-secondary">Choose File</label>
+            <button class="btn" onclick="uploadResume()">Upload</button>
+            <p id="resume-link" class="resume-link"></p>
+        </section>
+        
+        <script>
+            
+        </script>
+        
+        <section class="social-media card">
+            <h3 class="section-title">Connect with Me</h3>
+            <!-- Container to display the added social media links -->
+            <div id="social-links" class="social-links">
+                <!-- Display the links here dynamically -->
+            </div>
+            
+            <!-- Button to add social links -->
+            <button class="btn btn-secondary" id="add-link-button" onclick="toggleLinkForm()">Add Links</button>
+        
+            <!-- Hidden input fields and button to add new links -->
+            <div id="link-form" style="display: none;">
+                <label for="linkedin">LinkedIn:</label>
+                <input type="text" id="linkedin" placeholder="LinkedIn URL" />
+        
+                <label for="github">GitHub:</label>
+                <input type="text" id="github" placeholder="GitHub URL" />
+        
+                <label for="other">Other:</label>
+                <input type="text" id="other" placeholder="Other Social Media URL" />
+        
+                <button class="btn" onclick="addSocialLinks()">Submit</button>
+            </div>
         </section>
 
+        <footer>
+            <div class="footer-container">
+                <p>&copy; 2024 AlumNet. All Rights Reserved.</p>
+                <div class="footer-links">
+                    <a>Contact Us</a>
+                    <a>Terms of Service</a>
+                    <a>Privacy Policy</a>
+                </div>
+            </div>
+        </footer>
         
 
     <script>
@@ -82,6 +133,36 @@
 
         // Load profile info when the page loads
         document.addEventListener('DOMContentLoaded', loadProfileInfo);
+
+        function toggleDates() {
+                const currentlyEmployed = document.getElementById('currently-employed').value;
+                const endDateContainer = document.getElementById('end-date-container');
+                const startDateContainer = document.getElementById('start-date-container');
+                
+                if (currentlyEmployed === 'yes') {
+                    endDateContainer.style.display = 'none';
+                } else {
+                    endDateContainer.style.display = 'block';
+                }
+            }
+
+            document.addEventListener('DOMContentLoaded', () => {
+            const userId = window.location.pathname.split('/')[2];  // Get the userId from the profile page URL
+            const jobListingLink = document.getElementById('profile-page');
+            if (jobListingLink) {
+                console.log('user id being sent to profile:',userId)
+                jobListingLink.href = `/profile/${userId}`;  // Update the link to include userId
+            }
+            });
+            
+            document.addEventListener('DOMContentLoaded', () => {
+            const userId = window.location.pathname.split('/')[2];  // Get the userId from the profile page URL
+            const jobListingLink = document.getElementById('job-listing-link');
+            if (jobListingLink) {
+                console.log('user id being sent to job:',userId)
+                jobListingLink.href = `/joblisting/${userId}`;  // Update the link to include userId
+            }
+            });
     </script>
 </body>
 </html>

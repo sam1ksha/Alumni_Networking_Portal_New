@@ -10,11 +10,11 @@
     <header>
         <h1>Forums</h1>
         <nav>
-            <a href="profile.html">Profile</a> 
-            <a href="posts.html">Posts</a> 
-            <a href="job_details.html">Apply for Jobs</a> 
-            <a href="job_listing.html">Job Offers</a>
-            <a href="index.html">Logout</a>
+            <a href="/profile.html/:uid" id="profile-page">Profile</a>
+                <a href="/forums.html">Forums</a>
+                <a href="/posts.html">Posts</a> 
+                <a href="/joblisting/:uid" id="job-listing-link">Jobs</a>  
+                <a href="/index.html">Logout</a>
         </nav>
     </header>
     
@@ -78,6 +78,24 @@
 
         // Attach event listener to "Create New Topic" button
         document.getElementById('createForumBtn').addEventListener('click', createForum);
+    
+    
+        document.addEventListener('DOMContentLoaded', () => {
+            const userId = window.location.pathname.split('/')[2];  // Get the userId from the profile page URL
+            const jobListingLink = document.getElementById('profile-page');
+            if (jobListingLink) {
+                console.log('user id being sent to profile:',userId)
+                jobListingLink.href = `/profile/${userId}`;  // Update the link to include userId
+            }
+            });
+            document.addEventListener('DOMContentLoaded', () => {
+            const userId = window.location.pathname.split('/')[2];  // Get the userId from the profile page URL
+            const jobListingLink = document.getElementById('job-listing-link');
+            if (jobListingLink) {
+                console.log('user id being sent to job:',userId)
+                jobListingLink.href = `/joblisting/${userId}`;  // Update the link to include userId
+            }
+            });
     </script>
 </body>
 </html>

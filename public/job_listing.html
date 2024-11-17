@@ -4,51 +4,93 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Job Listings</title>
-    <link rel="stylesheet" href="css/job_listing_styles.css">
+    <link rel="stylesheet" href="/css/job_listing_styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="/js/job_listing.js"></script>
 </head>
 <body>
     <header>
         <nav>
             <div class="logo">AlumNet</div>
             <div class="nav-links">
-                <a href="forums.html">Forums</a>
-                <a href="posts.html">CPosts</a>
-                <a href="job_details.html">Apply for Jobs</a>
-                <a href="index.html">Logout</a>
+                <a href="/profile.html/:uid" id="profile-page">Profile</a>
+                <a href="/forums.html">Forums</a>
+                <a href="/posts.html">Posts</a> 
+                <a href="/joblisting/:uid" id="job-listing-link">Jobs</a>  
+                <a href="/index.html">Logout</a>
             </div>
         </nav>
     </header>
 
     <div class="container">
         <h1>Job Listings</h1>
-        <div class="job-listings">
-            <!-- Job Box Example -->
-            <div class="job-box" onclick="window.location.href='job_details.html?id=1'">
-                <h2>Software Engineer</h2>
-                <p>Role: Full-Time</p>
-                <p>Application Deadline: 2023-12-31</p>
-            </div>
-            <div class="job-box" onclick="window.location.href='job_details.html?id=2'">
-                <h2>Marketing Intern</h2>
-                <p>Role: Internship</p>
-                <p>Application Deadline: 2023-11-15</p>
-            </div>
-            <div class="job-box" onclick="window.location.href='job_details.html?id=3'">
-                <h2>Data Analyst</h2>
-                <p>Role: Part-Time</p>
-                <p>Application Deadline: 2023-12-15</p>
-            </div>
-            <!-- Add more job boxes as needed -->
+        <div class="job-listings" id="job-listings-container">
+            <!-- Job boxes will be dynamically injected here -->
         </div>
 
         <div class="actions">
-            <button class="btn" onclick="window.location.href='post_job.html'">Post a Job</button>
+            <button class="btn" id="appliedJobsButton">Applied Jobs</button>
+            <button class="btn" id="job-create-link">Post a Job</button>
+            <button class="btn" id="togglePanel">My Jobs</button>
         </div>
     </div>
 
+    <!-- Side Panel for Job Management -->
+<!-- Side Panel for Job Management -->
+<div class="right-panel" id="jobManagementPanel">
+    <div class="panel-header">
+        <h2>Jobs Created by Me</h2>
+        <button class="btn-close" id="closePanel">×</button>
+    </div>
+    <div class="panel-content">
+        <div class="my-jobs-list" id="myJobsList">
+            <!-- Job items will be inserted here -->
+        </div>
+    </div>
+</div>
+<!-- Left Panel for Applied Jobs -->
+<div class="left-panel" id="appliedJobsPanel">
+    <div class="panel-header">
+        <h2>Jobs I Applied For</h2>
+        <button class="btn-close" id="closeAppliedJobsPanel">×</button>
+    </div>
+    <div class="panel-content">
+        <div class="applied-jobs-list" id="appliedJobsList">
+            <!-- Applied job items will be dynamically loaded here -->
+        </div>
+    </div>
+</div>
+
+    <footer>
+        <div class="footer-container">
+            <p>&copy; 2024 AlumNet. All Rights Reserved.</p>
+            <div class="footer-links">
+                <a href="#">Contact Us</a>
+                <a href="#">Terms of Service</a>
+                <a href="#">Privacy Policy</a>
+            </div>
+        </div>
+    </footer>
     <script>
-        // You can add JavaScript here or link to an external file
+        document.addEventListener('DOMContentLoaded', () => {
+            const userId = window.location.pathname.split('/')[2];  // Get the userId from the profile page URL
+            const jobListingLink = document.getElementById('profile-page');
+            if (jobListingLink) {
+                console.log('user id being sent to profile:',userId)
+                jobListingLink.href = `/profile/${userId}`;  // Update the link to include userId
+            }
+            });
+            
+            document.addEventListener('DOMContentLoaded', () => {
+            const userId = window.location.pathname.split('/')[2];  // Get the userId from the profile page URL
+            const jobListingLink = document.getElementById('job-listing-link');
+            if (jobListingLink) {
+                console.log('user id being sent to job:',userId)
+                jobListingLink.href = `/joblisting/${userId}`;  // Update the link to include userId
+            }
+            });
     </script>
+
+
 </body>
 </html>
