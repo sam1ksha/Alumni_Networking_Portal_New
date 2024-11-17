@@ -20,28 +20,6 @@ CREATE TABLE all_users_info (
     PRIMARY KEY (user_id)
 );
 
-
-CREATE TABLE user_profile (
-    user_id INT AUTO_INCREMENT PRIMARY KEY,
-    first_name VARCHAR(100),
-    middle_name VARCHAR(100),
-    last_name VARCHAR(100),
-    user_type ENUM('alumni', 'student', 'employee', 'admin'),
-    work_experience TEXT,
-    resume TEXT,
-    profile_picture VARCHAR(255)
-);
-
-CREATE TABLE user_login (
-    user_id INT PRIMARY KEY,  -- 1:1 relationship, uses the same user_id
-    email VARCHAR(100) UNIQUE,
-    password VARCHAR(100),
-    phone_no VARCHAR(15),
-    registration_date DATE,
-    user_type ENUM('alumni', 'student', 'employee', 'admin'),
-    FOREIGN KEY (user_id) REFERENCES user_profile(user_id)
-);
-
 CREATE TABLE connects_with (
     user_id1 INT,
     user_id2 INT,
@@ -90,42 +68,6 @@ CREATE TABLE joins_forum (
     FOREIGN KEY (forum_id) REFERENCES forum(forum_id)
 );
 
-CREATE TABLE job_offer (
-    job_id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT,
-    title VARCHAR(255),
-    description TEXT,
-    role ENUM('intern', 'part time', 'full time'),
-    location VARCHAR(255),
-    salary DECIMAL(10, 2),
-    application_deadline DATE,
-    job_status ENUM('open', 'full', 'closed'),
-    required_skills TEXT,
-    application_count INT,
-    FOREIGN KEY (user_id) REFERENCES all_users_info(user_id)
-);
-
-CREATE TABLE searches_for (
-    user_id INT,
-    job_id INT,
-    PRIMARY KEY (user_id, job_id),
-    FOREIGN KEY (user_id) REFERENCES all_users_info(user_id),
-    FOREIGN KEY (job_id) REFERENCES job_offer(job_id)
-);
-
-CREATE TABLE job_application (
-    application_id INT AUTO_INCREMENT PRIMARY KEY,
-    job_id INT,
-    user_id INT,
-    status ENUM('submitted', 'shortlisted', 'approved', 'rejected'),
-    cover_letter TEXT,
-    FOREIGN KEY (job_id) REFERENCES job_offer(job_id),
-    FOREIGN KEY (user_id) REFERENCES all_users_info(user_id)
-);
-
-
-
-
 -- NEW UPDATES - IMP
 
 -- Step 1: Drop existing tables (in correct order to avoid foreign key dependency issues)
@@ -169,14 +111,12 @@ CREATE TABLE job_application (
     FOREIGN KEY (user_id) REFERENCES all_users_info(user_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
-
 CREATE TABLE user_status_updates (
     user_id INT NOT NULL,
     status TEXT DEFAULT NULL,
     PRIMARY KEY (user_id),
     FOREIGN KEY (user_id) REFERENCES all_users_info(user_id) ON DELETE CASCADE
 );
-
 
 CREATE TABLE user_links (
     user_id INT PRIMARY KEY,
@@ -185,7 +125,6 @@ CREATE TABLE user_links (
     other_url VARCHAR(255) DEFAULT NULL,
     FOREIGN KEY (user_id) REFERENCES all_users_info(user_id) ON DELETE CASCADE
 );
-
 
 DROP TABLE IF EXISTS work_experience;
 

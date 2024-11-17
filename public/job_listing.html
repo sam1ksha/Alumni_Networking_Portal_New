@@ -14,8 +14,8 @@
             <div class="logo">AlumNet</div>
             <div class="nav-links">
                 <a href="/profile.html/:uid" id="profile-page">Profile</a>
-                <a href="/forums.html">Forums</a>
-                <a href="/posts.html">Posts</a> 
+                <a href="/forums.html/:uid" id="forums-link">Forums</a>
+                <a href="/posts.html/:uid" id="posts-link">Posts</a> 
                 <a href="/joblisting/:uid" id="job-listing-link">Jobs</a>  
                 <a href="/index.html">Logout</a>
             </div>
@@ -73,22 +73,27 @@
     </footer>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const userId = window.location.pathname.split('/')[2];  // Get the userId from the profile page URL
-            const jobListingLink = document.getElementById('profile-page');
-            if (jobListingLink) {
-                console.log('user id being sent to profile:',userId)
-                jobListingLink.href = `/profile/${userId}`;  // Update the link to include userId
-            }
+            const userId = window.location.pathname.split('/')[2];  // Get the userId from the URL
+
+            const links = [
+                { id: 'profile-page', path: `/profile/${userId}` },
+                { id: 'job-listing-link', path: `/joblisting/${userId}` },
+                { id: 'forums-link', path: `/forums/${userId}` },  // This will now work
+                { id: 'posts-link', path: `/posts/${userId}` }
+            ];
+
+
+            links.forEach(link => {
+                const element = document.getElementById(link.id);
+                if (element) {
+                    element.href = link.path;  // Set href with userId
+                }
             });
+        });
             
-            document.addEventListener('DOMContentLoaded', () => {
-            const userId = window.location.pathname.split('/')[2];  // Get the userId from the profile page URL
-            const jobListingLink = document.getElementById('job-listing-link');
-            if (jobListingLink) {
-                console.log('user id being sent to job:',userId)
-                jobListingLink.href = `/joblisting/${userId}`;  // Update the link to include userId
-            }
-            });
+
+
+
     </script>
 
 

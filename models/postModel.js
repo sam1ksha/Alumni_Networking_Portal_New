@@ -1,53 +1,64 @@
-// postModel.js
 const db = require('../config/database');
 
 class Post {
-    static async create(postData) {
-        const { user_id, content, image } = postData;
-        const [result] = await db.execute(
-            `INSERT INTO posts (user_id, content, image) VALUES (?, ?, ?)`,
-            [user_id, content, image]
-        );
-        return result.insertId;
+    // Create a new post
+    static async createPost(userId, content, image) {
+        try {
+            const [result] = await db.execute(
+                `INSERT INTO posts (user_id, content, image) VALUES (?, ?, ?)`,
+                [userId, content, image || null]
+            );
+            return result.insertId;
+        } catch (error) {
+            throw error;
+        }
     }
 
-    static async findAllWithDetails(currentUserId) {
-        const [rows] = await db.execute(`
-            SELECT 
-                p.*, 
-                u.first_name, u.last_name, u.profile_picture,
-                (SELECT COUNT(*) FROM reacts_to WHERE post_id = p.post_id AND reaction = 'like') as likes,
-                (SELECT COUNT(*) FROM reacts_to WHERE post_id = p.post_id AND reaction = 'dislike') as dislikes,
-                (SELECT reaction FROM reacts_to WHERE post_id = p.post_id AND user_id = ?) as user_reaction
-            FROM posts p
-            JOIN all_users_info u ON p.user_id = u.user_id
-            ORDER BY p.created_at DESC
-        `, [currentUserId]);
-        return rows;
+    // Fetch posts for all users or a specific user
+    static async fetchPosts(userId = null) {
+        try {
+            let query = `
+                SELECT p.post_id, p.content, p.image, p.created_at, 
+                       CONCAT(u.first_name, ' ', u.last_name) AS authorName,
+                       (SELECT COUNT(*) FROM reacts_to WHERE post_id = p.post_id AND reaction = 'like') AS likes,
+                       (SELECT COUNT(*) FROM reacts_to WHERE post_id = p.post_id AND reaction = 'dislike') AS dislikes
+                FROM posts p
+                JOIN all_users_info u ON p.user_id = u.user_id
+                ${userId ? `WHERE p.user_id = ?` : ''}
+                ORDER BY p.created_at DESC
+            `;
+            const [rows] = userId ? await db.execute(query, [userId]) : await db.execute(query);
+            return rows;
+        } catch (error) {
+            throw error;
+        }
     }
 
-    static async reactToPost(postId, userId, reactionType) {
-        await db.execute(
-            `INSERT INTO reacts_to (post_id, user_id, reaction) VALUES (?, ?, ?)
-             ON DUPLICATE KEY UPDATE reaction = ?`,
-            [postId, userId, reactionType, reactionType]
-        );
+    // React to a post
+    static async reactToPost(postId, userId, reaction) {
+        try {
+            await db.execute(
+                `INSERT INTO reacts_to (post_id, user_id, reaction)
+                 VALUES (?, ?, ?)
+                 ON DUPLICATE KEY UPDATE reaction = ?`,
+                [postId, userId, reaction, reaction]
+            );
+        } catch (error) {
+            throw error;
+        }
     }
 
-    static async findByUsernameWithDetails(username, currentUserId) {
-        const [rows] = await db.execute(`
-            SELECT 
-                p.*, 
-                u.first_name, u.last_name, u.profile_picture,
-                (SELECT COUNT(*) FROM reacts_to WHERE post_id = p.post_id AND reaction = 'like') as likes,
-                (SELECT COUNT(*) FROM reacts_to WHERE post_id = p.post_id AND reaction = 'dislike') as dislikes,
-                (SELECT reaction FROM reacts_to WHERE post_id = p.post_id AND user_id = ?) as user_reaction
-            FROM posts p
-            JOIN all_users_info u ON p.user_id = u.user_id
-            WHERE CONCAT(u.first_name, ' ', u.last_name) LIKE ?
-            ORDER BY p.created_at DESC
-        `, [currentUserId, `%${username}%`]);
-        return rows;
+    // Delete a post
+    static async deletePost(postId, userId) {
+        try {
+            const [result] = await db.execute(
+                `DELETE FROM posts WHERE post_id = ? AND user_id = ?`,
+                [postId, userId]
+            );
+            return result.affectedRows > 0;
+        } catch (error) {
+            throw error;
+        }
     }
 }
 

@@ -15,8 +15,8 @@
             <div class="logo">AlumNet</div>
             <div class="nav-links">
                 <a href="/profile.html/:uid" id="profile-page">Profile</a>
-                <a href="/forums.html">Forums</a>
-                <a href="/posts.html">Posts</a> 
+                <a href="/forums/:uid" id="forums-link">Forums</a>
+                <a href="/posts/:uid" id="posts-link">Posts</a> 
                 <a href="/joblisting/:uid" id="job-listing-link">Jobs</a>  
                 <a href="/index.html">Logout</a>
             </div>
@@ -147,22 +147,46 @@
             }
 
             document.addEventListener('DOMContentLoaded', () => {
-            const userId = window.location.pathname.split('/')[2];  // Get the userId from the profile page URL
-            const jobListingLink = document.getElementById('profile-page');
-            if (jobListingLink) {
-                console.log('user id being sent to profile:',userId)
-                jobListingLink.href = `/profile/${userId}`;  // Update the link to include userId
+            // Extract the user ID from the URL path
+            const userId = window.location.pathname.split('/')[2];  // Assuming URL is something like /profile/:uid
+
+            // If userId is found, update the links
+            if (userId) {
+                // Update Profile Link
+                const profileLink = document.getElementById('profile-page');
+                if (profileLink) {
+                    console.log('User ID being sent to profile:', userId);
+                    profileLink.href = `/profile/${userId}`;  // Update the profile link with userId
+                }
+
+                // Update Forums Link
+                const forumsLink = document.getElementById('forums-link');
+                if (forumsLink) {
+                    console.log('User ID being sent to forums:', userId);
+                    forumsLink.href = `/forums/${userId}`;  // Update the forums link with userId
+                }
+
+                // Update Posts Link
+                const postsLink = document.getElementById('posts-link');
+                if (postsLink) {
+                    console.log('User ID being sent to posts:', userId);
+                    postsLink.href = `/posts/${userId}`;  // Update the posts link with userId
+                }
+
+                // Update Job Listing Link
+                const jobListingLink = document.getElementById('job-listing-link');
+                if (jobListingLink) {
+                    console.log('User ID being sent to job listing:', userId);
+                    jobListingLink.href = `/joblisting/${userId}`;  // Update the job listing link with userId
+                }
+            } else {
+                console.error('User ID not found in the URL');
             }
-            });
-            
-            document.addEventListener('DOMContentLoaded', () => {
-            const userId = window.location.pathname.split('/')[2];  // Get the userId from the profile page URL
-            const jobListingLink = document.getElementById('job-listing-link');
-            if (jobListingLink) {
-                console.log('user id being sent to job:',userId)
-                jobListingLink.href = `/joblisting/${userId}`;  // Update the link to include userId
-            }
-            });
+        });
+           
+
+
+
     </script>
 </body>
 </html>

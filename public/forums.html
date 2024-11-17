@@ -4,25 +4,45 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Forums</title>
-    <link rel="stylesheet" href="css/forums.css"> 
+    <link rel="stylesheet" href="/css/forums.css"> 
+    <script src="/js/forums.js" defer></script>
 </head>
 <body>
     <header>
         <h1>Forums</h1>
         <nav>
             <a href="/profile.html/:uid" id="profile-page">Profile</a>
-                <a href="/forums.html">Forums</a>
-                <a href="/posts.html">Posts</a> 
-                <a href="/joblisting/:uid" id="job-listing-link">Jobs</a>  
-                <a href="/index.html">Logout</a>
+            <a href="/forums.html/:uid" id="forums-link">Forums</a>
+            <a href="/posts.html/:uid" id="posts-link">Posts</a> 
+            <a href="/joblisting/:uid" id="job-listing-link">Jobs</a>  
+            <a href="/index.html">Logout</a>
         </nav>
     </header>
     
     <div class="content">
         <h2>Forum Discussions</h2>
+
+        <!-- Default Forum Button Container -->
+        <!-- Forum Button Container -->
+        <div id="defaultForum"></div>
+
+        <!-- Forum Details Popup (Initially Hidden) -->
+        <div id="forumDetailsPopup" style="display:none;">
+            <div>
+                <h2>Forum Details</h2>
+                <p class="forumTitle"></p>
+                <p class="forumBranch"></p>
+                <p class="forumYear"></p>
+                <p class="forumDate"></p>
+                <button onclick="document.getElementById('forumDetailsPopup').style.display = 'none'">Close</button>
+            </div>
+        </div>
+
+
         <div id="forumList">
             <!-- Dynamic forum topics will be rendered here -->
         </div>
+        
         <button class="btn" id="createForumBtn">Create New Topic</button>
     </div>
     
@@ -31,71 +51,27 @@
     </footer>
 
     <script>
-        // Function to fetch forums from the server
-        async function fetchForums() {
-            const response = await fetch('/api/forums');  // Fetch forums from the backend
-            const forums = await response.json();
-
-            const forumList = document.getElementById('forumList');
-            forumList.innerHTML = '';  // Clear existing forum list
-
-            // Loop through the forums and display them as button-like boxes
-            forums.forEach(forum => {
-                const forumItem = document.createElement('div');
-                forumItem.classList.add('forum-item');
-                forumItem.textContent = forum.title;
-                forumList.appendChild(forumItem);
-            });
-        }
-
-        // Function to create a new forum
-        async function createForum() {
-            const forumTitle = prompt("Enter forum title:");  // Prompt user for forum title
-
-            // Check if the user provided a title
-            if (!forumTitle.trim()) {
-                alert("Please enter a forum title.");
-                return;
-            }
-
-            const response = await fetch('/api/forums', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ title: forumTitle, admin_user_id: 1 })  // Assuming the admin user ID is 1
-            });
-
-            const result = await response.json();
-            if (result.success) {
-                alert(result.message);
-                fetchForums();  // Refresh forum list
-            } else {
-                alert('Error creating forum');
-            }
-        }
-
-        // Load forums when the page loads
-        window.onload = fetchForums;
-
-        // Attach event listener to "Create New Topic" button
-        document.getElementById('createForumBtn').addEventListener('click', createForum);
-    
-    
         document.addEventListener('DOMContentLoaded', () => {
-            const userId = window.location.pathname.split('/')[2];  // Get the userId from the profile page URL
-            const jobListingLink = document.getElementById('profile-page');
-            if (jobListingLink) {
-                console.log('user id being sent to profile:',userId)
-                jobListingLink.href = `/profile/${userId}`;  // Update the link to include userId
-            }
+            const userId = window.location.pathname.split('/')[2];  // Get the userId from the URL
+
+            // Fetch and display default forum for the user
+            fetchDefaultForum(userId);
+
+            const links = [
+                { id: 'profile-page', path: `/profile/${userId}` },
+                { id: 'job-listing-link', path: `/joblisting/${userId}` },
+                { id: 'forums-link', path: `/forums/${userId}` },  // This will now work
+                { id: 'posts-link', path: `/posts/${userId}` }
+            ];
+
+            links.forEach(link => {
+                const element = document.getElementById(link.id);
+                if (element) {
+                    element.href = link.path;  // Set href with userId
+                }
             });
-            document.addEventListener('DOMContentLoaded', () => {
-            const userId = window.location.pathname.split('/')[2];  // Get the userId from the profile page URL
-            const jobListingLink = document.getElementById('job-listing-link');
-            if (jobListingLink) {
-                console.log('user id being sent to job:',userId)
-                jobListingLink.href = `/joblisting/${userId}`;  // Update the link to include userId
-            }
-            });
+        });
+
     </script>
 </body>
 </html>

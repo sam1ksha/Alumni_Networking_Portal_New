@@ -10,7 +10,7 @@ const app = express();
 const db = mysql.createPool({
     host: process.env.DB_HOST || 'localhost',
     user: process.env.DB_USER || 'root',
-    password: process.env.DB_PASSWORD || 'ShArAnYa123!@#',
+    password: process.env.DB_PASSWORD || 'M@halakshmi234',
     database: process.env.DB_NAME || 'alumni_portal'
 });
 
@@ -44,10 +44,15 @@ const profileRoutes = require('./routes/profileRoutes');
 app.use('/api/profile', profileRoutes);
 const postsRoutes = require('./routes/postsRoutes'); 
 app.use('/api/posts', postsRoutes);
+const forumRoutes = require('./routes/forumRoutes'); 
+app.use('/api/forums', forumRoutes);
 const createjobRoutes = require('./routes/createjobRoutes');
 app.use('/api/createjob', createjobRoutes);  // Correct route for creating a job
 const listjobRoutes = require('./routes/joblistingRoutes');
 app.use('/api/joblisting', listjobRoutes);  // Correct route for creating a job
+
+
+app.get('/favicon.ico', (req, res) => res.status(204).end());
 
 
 // Serve Pages (HTML Files)
@@ -59,12 +64,14 @@ app.get('/profile/:id', authenticateUser, async (req, res) => {
 
 
 // Posts page
-app.get('/posts', authenticateUser, (req, res) => {
+app.get('/posts/:uid', authenticateUser, (req, res) => {
+    const userId = req.params.id;
     res.sendFile(path.join(__dirname, 'public', 'posts.html'));
 });
 
 // Forums page
-app.get('/forums', authenticateUser, (req, res) => {
+app.get('/forums/:uid', authenticateUser, (req, res) => {
+    const userId = req.params.id;
     res.sendFile(path.join(__dirname, 'public', 'forums.html'));
 });
 

@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Posts</title>
-    <link rel="stylesheet" href="css/posts.css">
+    <link rel="stylesheet" href="/css/posts.css">
 </head>
 <body>
     <header>
@@ -16,8 +16,8 @@
             </div>
             <nav>
                 <a href="/profile.html/:uid" id="profile-page">Profile</a>
-                <a href="/forums.html">Forums</a>
-                <a href="/posts.html">Posts</a> 
+                <a href="/posts/:uid" id="posts-link">Posts</a>
+                <a href="/forums.html" id="forums-link">Forums</a>
                 <a href="/joblisting/:uid" id="job-listing-link">Jobs</a>  
                 <a href="/index.html">Logout</a>
             </nav>
@@ -153,17 +153,11 @@
                     
                     li.innerHTML = `
                         <div class="post-header">
-                            <div class="post-author">
-                                <img src="${post.authorAvatar || '/images/default-avatar.png'}" alt="Avatar" class="author-avatar">
-                                <div class="author-info">
-                                    <h3>${post.authorName}</h3>
-                                    <span class="post-date">${formatDate(post.createdAt)}</span>
-                                </div>
-                            </div>
-                            ${post.isMine ? '<button class="delete-btn" onclick="deletePost(' + post.id + ')">Delete</button>' : ''}
+                            <h3>${post.authorName || 'Unknown User'}</h3>
+                            <span>${post.createdAt ? formatDate(post.createdAt) : 'Unknown Date'}</span>
                         </div>
                         <div class="post-content">
-                            <p>${post.content}</p>
+                            <p>${post.content || 'No content available'}</p>
                             ${post.image ? `<div class="post-image"><img src="${post.image}" alt="Post image"></div>` : ''}
                         </div>
                         <div class="post-actions">
@@ -174,7 +168,8 @@
                                 👎 <span>${post.dislikes}</span>
                             </button>
                         </div>
-                    `; 
+                    `;
+
                     
                     postsList.appendChild(li);
                 });
@@ -264,22 +259,25 @@
 
         // Load posts when the page loads
         window.onload = () => fetchPosts('all');
+
         document.addEventListener('DOMContentLoaded', () => {
-            const userId = window.location.pathname.split('/')[2];  // Get the userId from the profile page URL
-            const jobListingLink = document.getElementById('profile-page');
-            if (jobListingLink) {
-                console.log('user id being sent to profile:',userId)
-                jobListingLink.href = `/profile/${userId}`;  // Update the link to include userId
-            }
+            const userId = window.location.pathname.split('/')[2];  // Get the userId from the URL
+
+            const links = [
+                { id: 'profile-page', path: `/profile/${userId}` },
+                { id: 'job-listing-link', path: `/joblisting/${userId}` },
+                { id: 'forums-link', path: `/forums/${userId}` },  // This will now work
+                { id: 'posts-link', path: `/posts/${userId}` }
+            ];
+
+
+            links.forEach(link => {
+                const element = document.getElementById(link.id);
+                if (element) {
+                    element.href = link.path;  // Set href with userId
+                }
             });
-            document.addEventListener('DOMContentLoaded', () => {
-            const userId = window.location.pathname.split('/')[2];  // Get the userId from the profile page URL
-            const jobListingLink = document.getElementById('job-listing-link');
-            if (jobListingLink) {
-                console.log('user id being sent to job:',userId)
-                jobListingLink.href = `/joblisting/${userId}`;  // Update the link to include userId
-            }
-            });
+        });
 
     </script>
 </body>
