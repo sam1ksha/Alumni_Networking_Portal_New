@@ -123,3 +123,80 @@ CREATE TABLE job_application (
     FOREIGN KEY (user_id) REFERENCES all_users_info(user_id)
 );
 
+
+
+
+-- NEW UPDATES - IMP
+
+-- Step 1: Drop existing tables (in correct order to avoid foreign key dependency issues)
+DROP TABLE IF EXISTS job_application;
+DROP TABLE IF EXISTS searches_for;
+DROP TABLE IF EXISTS job_offer;
+
+-- Step 2: Create the `job_offer` table
+CREATE TABLE job_offer (
+    job_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT,  -- employer who creates the offer
+    title VARCHAR(255),
+    description TEXT,
+    role ENUM('intern', 'part time', 'full time'),
+    location VARCHAR(255),
+    salary DECIMAL(10, 2),
+    application_deadline DATE,
+    job_status ENUM('open', 'full', 'closed'),
+    required_skills TEXT,
+    application_count INT,
+    FOREIGN KEY (user_id) REFERENCES all_users_info(user_id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- Step 3: Create the `searches_for` table
+CREATE TABLE searches_for (
+    user_id INT,
+    job_id INT,
+    PRIMARY KEY (user_id, job_id),
+    FOREIGN KEY (user_id) REFERENCES all_users_info(user_id) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (job_id) REFERENCES job_offer(job_id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- Step 4: Create the `job_application` table
+CREATE TABLE job_application (
+    application_id INT AUTO_INCREMENT PRIMARY KEY,
+    job_id INT,
+    user_id INT,
+    status ENUM('submitted', 'shortlisted', 'approved', 'rejected'),
+    cover_letter TEXT,
+    FOREIGN KEY (job_id) REFERENCES job_offer(job_id) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES all_users_info(user_id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+
+CREATE TABLE user_status_updates (
+    user_id INT NOT NULL,
+    status TEXT DEFAULT NULL,
+    PRIMARY KEY (user_id),
+    FOREIGN KEY (user_id) REFERENCES all_users_info(user_id) ON DELETE CASCADE
+);
+
+
+CREATE TABLE user_links (
+    user_id INT PRIMARY KEY,
+    linkedin_url VARCHAR(255) DEFAULT NULL,
+    github_url VARCHAR(255) DEFAULT NULL,
+    other_url VARCHAR(255) DEFAULT NULL,
+    FOREIGN KEY (user_id) REFERENCES all_users_info(user_id) ON DELETE CASCADE
+);
+
+
+DROP TABLE IF EXISTS work_experience;
+
+CREATE TABLE work_experience (
+    exp_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT,
+    job_title VARCHAR(255) NOT NULL,
+    company_name VARCHAR(255) NOT NULL,
+    currently_employed ENUM('yes', 'no') NOT NULL,
+    start_date DATE NOT NULL,
+    end_date DATE DEFAULT NULL,
+    responsibilities TEXT DEFAULT NULL,
+    FOREIGN KEY (user_id) REFERENCES all_users_info(user_id) ON DELETE CASCADE
+);
