@@ -139,3 +139,53 @@ CREATE TABLE work_experience (
     responsibilities TEXT DEFAULT NULL,
     FOREIGN KEY (user_id) REFERENCES all_users_info(user_id) ON DELETE CASCADE
 );
+
+
+--Procedure, Trigger, Function for Posts page
+
+DELIMITER //
+
+CREATE PROCEDURE CreatePost(IN userId INT, IN content TEXT, IN image VARCHAR(255))
+BEGIN
+    INSERT INTO posts (user_id, content, image) VALUES (userId, content, image);
+END //
+
+DELIMITER ;
+
+
+
+CREATE TABLE user_stats (
+    user_id INT PRIMARY KEY,
+    post_count INT DEFAULT 0,
+    FOREIGN KEY (user_id) REFERENCES all_users_info(user_id)
+);
+
+
+
+DELIMITER //
+
+CREATE TRIGGER after_post_insert
+AFTER INSERT ON posts
+FOR EACH ROW
+BEGIN
+    INSERT INTO user_stats (user_id, post_count) 
+    VALUES (NEW.user_id, 1) 
+    ON DUPLICATE KEY UPDATE post_count = post_count + 1;
+END //
+
+DELIMITER ;
+
+
+
+DELIMITER //
+
+CREATE FUNCTION GetPostCount(userId INT) 
+RETURNS INT
+DETERMINISTIC
+BEGIN
+    DECLARE postCount INT;
+    SELECT COUNT(*) INTO postCount FROM posts WHERE user_id = userId;
+    RETURN postCount;
+END //
+
+DELIMITER ;

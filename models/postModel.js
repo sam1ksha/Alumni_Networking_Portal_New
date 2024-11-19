@@ -1,14 +1,14 @@
 const db = require('../config/database');
 
 class Post {
-    // Create a new post
+    // Create a new post using a stored procedure
     static async createPost(userId, content, image) {
         try {
             const [result] = await db.execute(
-                `INSERT INTO posts (user_id, content, image) VALUES (?, ?, ?)`,
+                `CALL CreatePost(?, ?, ?)`,
                 [userId, content, image || null]
             );
-            return result.insertId;
+            return result[0].insertId; // Adjust based on your procedure's output
         } catch (error) {
             throw error;
         }
@@ -29,6 +29,19 @@ class Post {
             `;
             const [rows] = userId ? await db.execute(query, [userId]) : await db.execute(query);
             return rows;
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    // Get the total number of posts for a specific user
+    static async getPostCount(userId) {
+        try {
+            const [rows] = await db.execute(
+                `SELECT GetPostCount(?) AS postCount`,
+                [userId]
+            );
+            return rows[0].postCount;
         } catch (error) {
             throw error;
         }
