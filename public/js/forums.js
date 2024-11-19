@@ -30,6 +30,6 @@ async function fetchDefaultForum(userId) {
 
 
 // Event listener for creating a new forum topic (not default)
-document.getElementById('createForumBtn').addEventListener('click', () => {
-    alert('Feature to create a new forum is under development.');
-});
+//document.getElementById('createForumBtn').addEventListener('click', () => {
+//    alert('Feature to create a new forum is under development.');
+//});

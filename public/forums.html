@@ -26,6 +26,26 @@
         <!-- Forum Button Container -->
         <div id="defaultForum"></div>
 
+        <p id="errorMessage" style="color: red; display: none;">Please enter a forum title.</p>
+
+        <input type="text" id="forumTitleInput" placeholder="Enter forum title" />
+
+
+        <!-- Forum Creation Popup (Initially Hidden) -->
+    <div id="createForumPopup" style="display:none;">
+        <div>
+            <h2>Create New Forum</h2>
+            <label for="forumTitleInput">Forum Title:</label>
+            <input type="text" id="forumTitleInput" placeholder="Enter forum title">
+            <label for="forumTopicInput">Forum Topic:</label>
+            <input type="text" id="forumTopicInput" placeholder="Enter forum topic">
+            <button id="createForumSubmit">Create</button>
+            <button onclick="document.getElementById('createForumPopup').style.display = 'none'">Cancel</button>
+            <p id="errorMessage" style="color:red; display:none;">Both fields are required.</p>
+        </div>
+    </div>
+
+
         <!-- Forum Details Popup (Initially Hidden) -->
         <div id="forumDetailsPopup" style="display:none;">
             <div>
@@ -68,6 +88,27 @@
                 const element = document.getElementById(link.id);
                 if (element) {
                     element.href = link.path;  // Set href with userId
+                }
+            });
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const createForumBtn = document.getElementById('createForumBtn');
+            const forumTitleInput = document.getElementById('forumTitleInput');
+            const errorMessage = document.getElementById('errorMessage');
+
+            // Handle the "Create New Topic" button click
+            createForumBtn.addEventListener('click', () => {
+                const title = forumTitleInput.value.trim(); // Get trimmed input value
+
+                if (!title) {
+                    // Show error message if input is empty
+                    errorMessage.style.display = 'block';
+                } else {
+                    // Success message and reset input/error
+                    alert(`Forum created successfully with Title: "${title}"`);
+                    errorMessage.style.display = 'none'; // Hide error message
+                    forumTitleInput.value = ''; // Clear input field
                 }
             });
         });

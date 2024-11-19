@@ -144,12 +144,12 @@ CREATE TABLE work_experience (
 --Procedure, Trigger, Function for Posts page
 
 DELIMITER //
-
-CREATE PROCEDURE CreatePost(IN userId INT, IN content TEXT, IN image VARCHAR(255))
+CREATE PROCEDURE CreatePost(IN userId INT, IN content TEXT, IN image VARCHAR(255), OUT postId INT)
 BEGIN
-    INSERT INTO posts (user_id, content, image) VALUES (userId, content, image);
+    INSERT INTO posts (user_id, content, image) 
+    VALUES (userId, content, image);
+    SET postId = LAST_INSERT_ID();
 END //
-
 DELIMITER ;
 
 

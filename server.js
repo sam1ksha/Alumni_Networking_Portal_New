@@ -10,7 +10,7 @@ const app = express();
 const db = mysql.createPool({
     host: process.env.DB_HOST || 'localhost',
     user: process.env.DB_USER || 'root',
-    password: process.env.DB_PASSWORD || 'M@halakshmi234',
+    password: process.env.DB_PASSWORD || 'ShArAnYa123!@#',
     database: process.env.DB_NAME || 'alumni_portal'
 });
 
